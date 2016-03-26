@@ -9,6 +9,7 @@ public:
     ~Sudokugenerator(){}
 
     void showArray(int floor = 10);
+    void init(int seed = 0);
 
 protected:
     int sudokuArray[9][9][10];
@@ -21,6 +22,8 @@ private:
     void prepareArray();
     void generateSudoku(int seed = 0);
     bool arrayChanged = false;
+    bool numberCanBePicked(int x, int y, int number);
+    void removeNumberFromArray(int x, int y, int number);
 };
 
 #endif // __Sudokugenerator__

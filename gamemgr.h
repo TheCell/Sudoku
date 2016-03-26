@@ -18,8 +18,8 @@ public:
     bool isRunning() { return m_isRunning; }
 
 private:
-    bool m_isRunning = false;
     Sudokugenerator sudokugenerator;
+    bool m_isRunning = false;
 };
 
 #endif // __Gamemgr__

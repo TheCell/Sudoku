@@ -3,7 +3,7 @@
 
 void Gamemgr::init()
 {
-    //Gamemgr::sudokugenerator = Sudokugenerator();
+    Gamemgr::sudokugenerator.init(123);
     Gamemgr::m_isRunning = true;
 }
 
@@ -20,8 +20,7 @@ void Gamemgr::update()
 void Gamemgr::render()
 {
 
-    Gamemgr::sudokugenerator.showArray();
-
+    Gamemgr::sudokugenerator.showArray(3);
 }
 
 void Gamemgr::clean()
