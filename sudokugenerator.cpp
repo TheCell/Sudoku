@@ -1,7 +1,8 @@
 #include <QCoreApplication>
 #include "sudokugenerator.h"
 #include <iostream>
-#include "randomengine.h"
+#include <algorithm> // for std::find
+#include <iterator> // for std::begin, std::end
 
 Sudokugenerator::Sudokugenerator()
 {
@@ -39,6 +40,12 @@ void Sudokugenerator::prepareArray()
 void Sudokugenerator::generateSudoku(int seed)
 {
     Sudokugenerator::prepareArray();
+    Sudokugenerator::initGenerator(seed);
+    for (int i = 0; i < 9; i++)
+    {
+        Sudokugenerator::generateBlock(i);
+        Sudokugenerator::showBlock(i);
+    }
     /*
     Sudokugenerator::removeNumberFromArray(8, 8, 3);
     if (Sudokugenerator::numberCanBePicked(5, 5, 3))
@@ -50,7 +57,7 @@ void Sudokugenerator::generateSudoku(int seed)
         std::cout << "nope";
     }
 
-*/
+
     Randomengine myEngine = Randomengine(seed);
     bool finished = false;
     bool gotNumber = false;
@@ -89,7 +96,7 @@ void Sudokugenerator::generateSudoku(int seed)
         std::cout << "x: " << x << " y: " << y << std::endl;
     }
 
-    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::arrayChanged = true;*/
     /*
     std::cout << myEngine.getNumber() << std::endl;
     std::cout << myEngine.getNumber() << std::endl;
@@ -180,5 +187,60 @@ void Sudokugenerator::removeNumberFromArray(int x, int y, int number)
         {
             Sudokugenerator::sudokuArray[x + j][y + i][number] = -1 ;
         }
+    }
+}
+
+void Sudokugenerator::generateBlock(int blockNr)
+{
+    int randomNumber = 0;
+    int addedNumbers = 0;
+    bool sequenceGenerated = false;
+    int numberSequence[9];
+    int counter = 0;
+    int* end = numberSequence + 9;
+
+    while (!sequenceGenerated)
+    {
+        randomNumber = Sudokugenerator::numberGenerator.getNumber();
+
+        int* result = std::find(numberSequence, end, randomNumber);
+        if (result == end)
+        {
+            numberSequence[addedNumbers] = randomNumber;
+            addedNumbers++;
+        }
+        if (addedNumbers == 9)
+        {
+            sequenceGenerated = true;
+        }
+    }
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            Sudokugenerator::sudokuBlocks[j][i][blockNr] = numberSequence[counter];
+            counter ++;
+        }
+    }
+}
+
+void Sudokugenerator::initGenerator(int seed)
+{
+    Sudokugenerator::numberGenerator = Randomengine(seed);
+}
+
+void Sudokugenerator::showBlock(int blockNr)
+{
+    printf("3D Array, Floor number: %d\n", blockNr);
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            printf("%d ", Sudokugenerator::sudokuBlocks[j][i][blockNr]);
+        }
+
+        printf("\n");
     }
 }
