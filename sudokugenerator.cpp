@@ -15,22 +15,24 @@ void Sudokugenerator::init(int seed)
 
 void Sudokugenerator::prepareArray()
 {
-    for (int i = 9; i >= 0; i--)
+    // fill floor 1-9 with numbers
+    for (int i = 1; i < 10; i++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int y = 0; y < 9; y++)
         {
-            for (int k = 0; k < 9; k++)
+            for (int x = 0; x < 9; x++)
             {
-                Sudokugenerator::sudokuArray[k][j][i] = i;
+                Sudokugenerator::sudokuArray[x][y][i] = (i);
             }
         }
     }
 
-    for (int i = 9; i >= 0; i--)
+    // floor 0 is the playfloor
+    for (int y = 9; y >= 0; y--)
     {
-        for (int j = 0; j < 9; j++)
+        for (int x = 0; x < 9; x++)
         {
-            Sudokugenerator::sudokuArray[j][i][10] = 11;
+            Sudokugenerator::sudokuArray[x][y][0] = 0;
         }
     }
 
@@ -41,7 +43,33 @@ void Sudokugenerator::generateSudoku(int seed)
 {
     Sudokugenerator::prepareArray();
     Sudokugenerator::initGenerator(seed);
-    Sudokugenerator::fillBlockArray();
+
+    /*while (Sudokugenerator[x][y][0] == 0)
+    {
+    }*/
+
+    // one problem remains. I can run into a dead end.
+    int randomNumber = 0;
+
+    for (int y = 0; y < 9; y++)
+    {
+        for (int x = 0; x < 9; x++)
+        {
+            while (Sudokugenerator::sudokuArray[x][y][0] == 0)
+            {
+                randomNumber = Sudokugenerator::numberGenerator.getNumber();
+
+                if (Sudokugenerator::numberCanBePicked(x, y, randomNumber))
+                {
+                    Sudokugenerator::removeNumberFromArray(x, y, randomNumber);
+                    Sudokugenerator::sudokuArray[x][y][0] = randomNumber;
+                }
+            }
+        }
+    }
+
+    Sudokugenerator::showArray(9);
+    /*Sudokugenerator::fillBlockArray();
 
     printf("horizontal: %d\n", Sudokugenerator::horizontalBlocksOk());
     while (!Sudokugenerator::horizontalBlocksOk())
@@ -54,7 +82,7 @@ void Sudokugenerator::generateSudoku(int seed)
     {
         //Sudokugenerator::generateBlock(i);
         Sudokugenerator::showBlock(i);
-    }
+    }*/
     /*
     Sudokugenerator::removeNumberFromArray(8, 8, 3);
     if (Sudokugenerator::numberCanBePicked(5, 5, 3))
@@ -130,11 +158,11 @@ void Sudokugenerator::showArray(int floor)
     {
         printf("3D Array, Floor number: %d\n", floor);
 
-        for (int i = 0; i < 9; i++)
+        for (int y = 0; y < 9; y++)
         {
-            for (int j = 0; j < 9; j++)
+            for (int x = 0; x < 9; x++)
             {
-                printf("%d ", Sudokugenerator::sudokuArray[j][i][floor]);
+                printf("%d ", Sudokugenerator::sudokuArray[x][y][floor]);
             }
 
             printf("\n");
@@ -159,9 +187,9 @@ void Sudokugenerator::removeNumberFromArray(int x, int y, int number)
     for (int i = 0; i < 9; i++)
     {
         // remove horizontal
-        Sudokugenerator::sudokuArray[x][i][number] = -1;
+        Sudokugenerator::sudokuArray[x][i][number] = 0;
         // remove vertical
-        Sudokugenerator::sudokuArray[i][y][number] = -1;
+        Sudokugenerator::sudokuArray[i][y][number] = 0;
     }
 
     if (x < 3)
@@ -194,7 +222,7 @@ void Sudokugenerator::removeNumberFromArray(int x, int y, int number)
     {
         for (int j = 0; j < 3; j++)
         {
-            Sudokugenerator::sudokuArray[x + j][y + i][number] = -1 ;
+            Sudokugenerator::sudokuArray[x + j][y + i][number] = 0;
         }
     }
 }
@@ -253,6 +281,7 @@ void Sudokugenerator::fillBlockArray()
 
 void Sudokugenerator::initGenerator(int seed)
 {
+    printf("\nSeed: %d\n\n", seed);
     Sudokugenerator::numberGenerator = Randomengine(seed);
 }
 

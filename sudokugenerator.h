@@ -10,7 +10,7 @@ public:
     Sudokugenerator();
     ~Sudokugenerator(){}
 
-    void showArray(int floor = 10);
+    void showArray(int floor = 0);
     void showBlock(int blockNr = 0);
     void init(int seed = 0);
 
