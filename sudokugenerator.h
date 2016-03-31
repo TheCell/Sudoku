@@ -31,6 +31,10 @@ private:
     bool numberCanBePicked(int x, int y, int number);
     void removeNumberFromArray(int x, int y, int number);
     void generateBlock(int blockNr);
+    void fillBlockArray();
+    bool sudokuGeneratedFromBlocks();
+    bool horizontalBlocksOk();
+    bool verticalBlocksOk();
 };
 
 #endif // __Sudokugenerator__
