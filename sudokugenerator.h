@@ -29,7 +29,8 @@ private:
     bool arrayChanged = false;
     bool numberCanBePicked(int x, int y, int number);
     void removeNumberFromArray(int x, int y, int number);
-    void fillBlockArray();
+    int cellHasOnlyOneValue(int x, int y);
+    std::tuple<int, int, int> blockHasOnlyOneValue(int x, int y);
 };
 
 #endif // __Sudokugenerator__

@@ -75,9 +75,12 @@ void Sudokugenerator::generateSudoku(int seed)
         }
     }*/
 
-    int x = 0;
-    int y = 0;
+    /*
+     * working!
+     */
 
+    /*int x = 0;
+    int y = 0;
     for (int i = 0; i < 7; i++)
     {
         bool numberRemoved = false;
@@ -95,94 +98,98 @@ void Sudokugenerator::generateSudoku(int seed)
 
         }
 
-    }
-
-    Sudokugenerator::arrayChanged = true;
-    Sudokugenerator::showArray();
-
-
-    //Sudokugenerator::showArray(9);
-    /*Sudokugenerator::fillBlockArray();
-
-    printf("horizontal: %d\n", Sudokugenerator::horizontalBlocksOk());
-    while (!Sudokugenerator::horizontalBlocksOk())
-    {
-        Sudokugenerator::fillBlockArray();
-    }
-    printf("horizontal: %d\n", Sudokugenerator::horizontalBlocksOk());
+    }*/
 
     for (int i = 0; i < 9; i++)
     {
-        //Sudokugenerator::generateBlock(i);
-        Sudokugenerator::showBlock(i);
-    }*/
-    /*
-    Sudokugenerator::removeNumberFromArray(8, 8, 3);
-    if (Sudokugenerator::numberCanBePicked(5, 5, 3))
-    {
-        std::cout << "yes";
-    }
-    else
-    {
-        std::cout << "nope";
-    }
+        bool numberRemoved = false;
+        bool numberRemoved2 = false;
 
-
-    Randomengine myEngine = Randomengine(seed);
-    bool finished = false;
-    bool gotNumber = false;
-    int randomNumber = 0;
-    int x = 0;
-    int y = 0;
-
-    while (!finished)
-    {
-        gotNumber = false;
-
-        while (!gotNumber)
+        while (!numberRemoved)
         {
-            randomNumber = myEngine.getNumber();
-            //std::cout << randomNumber;
-            if (Sudokugenerator::numberCanBePicked(x, y, randomNumber))
+            randomNumber = Sudokugenerator::numberGenerator.getNumber();
+            if (Sudokugenerator::numberCanBePicked(i, 0, randomNumber))
             {
-                Sudokugenerator::sudokuArray[x][y][10] = randomNumber;
-                Sudokugenerator::removeNumberFromArray(x, y, randomNumber);
-                gotNumber = true;
-                Sudokugenerator::arrayChanged = true;
-                Sudokugenerator::showArray(10);
+                Sudokugenerator::removeNumberFromArray(i, 0, randomNumber);
+                numberRemoved = true;
             }
         }
-        x++;
-        if (x > 8)
-        {
-            x = 0;
-            y++;
-        }
-        if (y > 8)
-        {
-            finished = true;
-        }
 
-        std::cout << "x: " << x << " y: " << y << std::endl;
+        if (i > 0)
+        {
+            while (!numberRemoved2)
+            {
+                randomNumber = Sudokugenerator::numberGenerator.getNumber();
+                if (Sudokugenerator::numberCanBePicked(0, i, randomNumber))
+                {
+                    Sudokugenerator::removeNumberFromArray(0, i, randomNumber);
+                    numberRemoved2 = true;
+                }
+            }
+        }
     }
 
-    Sudokugenerator::arrayChanged = true;*/
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(1);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(2);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(3);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(4);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(5);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(6);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(7);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(8);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(9);
+
     /*
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-    std::cout << myEngine.getNumber() << std::endl;
-*/
+    bool testnu = true;
+    while(testnu)
+    {
+        randomNumber = Sudokugenerator::numberGenerator.getNumber();
+        if (Sudokugenerator::numberCanBePicked(2,1,randomNumber))
+        {
+            Sudokugenerator::removeNumberFromArray(2,1,randomNumber);
+            testnu = false;
+        }
+    }
+    testnu = true;
+    while(testnu)
+    {
+        randomNumber = Sudokugenerator::numberGenerator.getNumber();
+        if (Sudokugenerator::numberCanBePicked(2,2,randomNumber))
+        {
+            Sudokugenerator::removeNumberFromArray(2,2,randomNumber);
+            testnu = false;
+        }
+    }
+    testnu = true;
+    while(testnu)
+    {
+        randomNumber = Sudokugenerator::numberGenerator.getNumber();
+        if (Sudokugenerator::numberCanBePicked(1,2,randomNumber))
+        {
+            Sudokugenerator::removeNumberFromArray(1,2,randomNumber);
+            testnu = false;
+        }
+    }
 
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(3);
 
+    auto test = Sudokugenerator::blockHasOnlyOneValue(1, 1);
+    printf("block has: %d\n", std::get<0>(test));
+    int test2 = Sudokugenerator::cellHasOnlyOneValue(1, 1);
+    printf("Cell has: %d\n", test2);*/
+
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray();
 }
 
 void Sudokugenerator::showArray(int floor)
@@ -313,16 +320,22 @@ void Sudokugenerator::removeNumberFromArray(int x, int y, int number)
 
     for (int i = 0; i < 9; i++)
     {
-        // remove horizontal
+        // remove column
         if (Sudokugenerator::sudokuArray[x][i][number] == number)
         {
             Sudokugenerator::sudokuArray[x][i][number] = 0;
         }
 
-        // remove vertical
+        // remove row
         if (Sudokugenerator::sudokuArray[i][y][number] == number)
         {
             Sudokugenerator::sudokuArray[i][y][number] = 0;
+        }
+
+        // remove on all other floors.
+        if (Sudokugenerator::sudokuArray[x][y][i] == i)
+        {
+            Sudokugenerator::sudokuArray[x][y][i] = 0;
         }
     }
 
@@ -364,25 +377,115 @@ void Sudokugenerator::removeNumberFromArray(int x, int y, int number)
     }
 }
 
-void Sudokugenerator::fillBlockArray()
-{
-    bool blocksFilled = false;
-    int counter = 0;
-
-    while (!blocksFilled)
-    {
-        Sudokugenerator::generateBlock(counter);
-
-        counter ++;
-        if (counter == 9)
-        {
-            blocksFilled = true;
-        }
-    }
-}
-
 void Sudokugenerator::initGenerator(int seed)
 {
     printf("\nSeed: %d\n\n", seed);
     Sudokugenerator::numberGenerator = Randomengine(seed);
+}
+
+/**
+ * @brief Sudokugenerator::cellHasOnlyOneValue checks a given cell. If there are multiple values still possible to fill in, it returns -1.
+ * @param x
+ * @param y
+ * @param number we want to check
+ * @return Returns the only possible Number, if there are multiple Numbers possible in the given cell returns -1.
+ */
+int Sudokugenerator::cellHasOnlyOneValue(int x, int y)
+{
+    int onlyNumber = -1;
+
+    for (int i = 10; i > 0; i--)
+    {
+        if (Sudokugenerator::sudokuArray[x][y][i] == i)
+        {
+            // first match? asign the value. Multiple match will stop and return -1
+            if (onlyNumber == -1)
+            {
+                onlyNumber = i;
+            }
+            else
+            {
+                // more then 1 number possible for this cell. Return -1
+                return -1;
+            }
+        }
+        /*
+        // skip the one number we want to fill in
+        if (i != number)
+        {
+            // if a floor has still the prefilled number in, we know that besides our wanted floor there is another floor that could possibly fill this cell.
+            if (Sudokugenerator::sudokuArray[x][y][number] == number)
+            {
+                return false;
+            }
+        }*/
+    }
+    return onlyNumber;
+}
+
+/**
+ * @brief Sudokugenerator::blockHasOnlyOneValue
+ * @param x
+ * @param y
+ * @param number
+ * @return tuple <number, x, y> number contains -1 if there are still multiple values available. Else returns the Number, X, Y coordinate.
+ */
+std::tuple<int, int, int> Sudokugenerator::blockHasOnlyOneValue(int x, int y)
+{
+    auto lastValue = std::make_tuple (-1, 0, 0);
+
+    if (x < 3)
+    {
+        x = 0;
+    }
+    else if (x < 6)
+    {
+        x = 3;
+    }
+    else
+    {
+        x = 6;
+    }
+
+    if (y < 3)
+    {
+        y = 0;
+    }
+    else if (y < 6)
+    {
+        y = 3;
+    }
+    else
+    {
+        y = 6;
+    }
+
+    for (int x2 = 0; x2 < 3; x2++)
+    {
+        for (int y2 = 0; y2 < 3; y2++)
+        {
+            for (int i = 10; i > 0; i--)
+            {
+                if (Sudokugenerator::sudokuArray[x + x2][y + y2][i] == i)
+                {
+                    // was there already a value asigned other then the current i or is it the first value found and maybe unique in this block
+                    if (std::get<0>(lastValue) == -1)
+                    {
+                        std::get<0>(lastValue) = i;
+                        std::get<1>(lastValue) = x + x2;
+                        std::get<2>(lastValue) = y + y2;
+
+                        std::cout << "\nNumber:" << std::get<0>(lastValue) << "\n";
+                    }
+                    else
+                    {
+                        // more then 1 number possible, returning -1
+                        std::get<0>(lastValue) = -1;
+                        return lastValue;
+                    }
+                }
+            }
+        }
+    }
+    return lastValue;
 }
