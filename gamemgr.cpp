@@ -20,7 +20,7 @@ void Gamemgr::update()
 void Gamemgr::render()
 {
 
-    Gamemgr::sudokugenerator.showArray(3);
+    Gamemgr::sudokugenerator.showArray(0);
 }
 
 void Gamemgr::clean()

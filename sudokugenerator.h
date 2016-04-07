@@ -13,6 +13,7 @@ public:
     void showArray(int floor = 0);
     void showBlock(int blockNr = 0);
     void init(int seed = 0);
+    bool loadFromFile(std::string sudokuString);
 
 protected:
     int sudokuArray[9][9][10];

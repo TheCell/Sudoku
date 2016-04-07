@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm> // for std::find
 #include <iterator> // for std::begin, std::end
+#include <string>
 
 Sudokugenerator::Sudokugenerator()
 {
@@ -10,7 +11,17 @@ Sudokugenerator::Sudokugenerator()
 
 void Sudokugenerator::init(int seed)
 {
-    Sudokugenerator::generateSudoku(seed);
+    //Sudokugenerator::generateSudoku(seed);
+    Sudokugenerator::prepareArray();
+    std::string sudokuString = "003020600900305001001806400008102900700000008006708200002609500800203009005010300";
+    if (Sudokugenerator::loadFromFile(sudokuString))
+    {
+        std::cout << "loading success!";
+    }
+    else
+    {
+        std::cout << "loading failed!";
+    }
 }
 
 void Sudokugenerator::prepareArray()
@@ -41,7 +52,6 @@ void Sudokugenerator::prepareArray()
 
 void Sudokugenerator::generateSudoku(int seed)
 {
-    Sudokugenerator::prepareArray();
     Sudokugenerator::initGenerator(seed);
 
     /*while (Sudokugenerator[x][y][0] == 0)
@@ -148,8 +158,8 @@ void Sudokugenerator::generateSudoku(int seed)
     Sudokugenerator::arrayChanged = true;
     Sudokugenerator::showArray(9);
 
-    /*
-    bool testnu = true;
+
+    /*bool testnu = true;
     while(testnu)
     {
         randomNumber = Sudokugenerator::numberGenerator.getNumber();
@@ -184,7 +194,7 @@ void Sudokugenerator::generateSudoku(int seed)
     Sudokugenerator::showArray(3);
 
     auto test = Sudokugenerator::blockHasOnlyOneValue(1, 1);
-    printf("block has: %d\n", std::get<0>(test));
+    printf("block has: %d,%d,%d\n", std::get<0>(test),std::get<1>(test),std::get<2>(test));
     int test2 = Sudokugenerator::cellHasOnlyOneValue(1, 1);
     printf("Cell has: %d\n", test2);*/
 
@@ -488,4 +498,34 @@ std::tuple<int, int, int> Sudokugenerator::blockHasOnlyOneValue(int x, int y)
         }
     }
     return lastValue;
+}
+
+bool Sudokugenerator::loadFromFile(std::string sudokuString)
+{
+    int x = -1;
+    int y = -1;
+
+    for (int i = 0; i < sudokuString.length(); i++)
+    {
+        x = i % 9;
+        if (i % 9 == 0)
+        {
+            y++;
+        }
+        /*std::cout << i << ": " << sudokuString[i] << "\n";
+        printf("\n%d\n", (sudokuString[i] - '0'));*/
+        /*if ((sudokuString[i] - '0') > 0)
+        {
+            printf("x:%d y:%d\n", x, y);
+        }*/
+        if (Sudokugenerator::numberCanBePicked(x, y, (sudokuString[i] - '0')))
+        {
+            Sudokugenerator::removeNumberFromArray(x, y, (sudokuString[i] - '0'));
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true;
 }
