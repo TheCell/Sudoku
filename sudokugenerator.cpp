@@ -51,7 +51,7 @@ void Sudokugenerator::generateSudoku(int seed)
     // one problem remains. I can run into a dead end.
     int randomNumber = 0;
 
-    for (int y = 0; y < 9; y++)
+    /*for (int y = 0; y < 9; y++)
     {
         for (int x = 0; x < 9; x++)
         {
@@ -62,13 +62,46 @@ void Sudokugenerator::generateSudoku(int seed)
                 if (Sudokugenerator::numberCanBePicked(x, y, randomNumber))
                 {
                     Sudokugenerator::removeNumberFromArray(x, y, randomNumber);
+                    printf("remove Number: %d\n", randomNumber);
+
                     Sudokugenerator::sudokuArray[x][y][0] = randomNumber;
                 }
+
+                Sudokugenerator::showArray();
+
             }
+
+            Sudokugenerator::showArray();
         }
+    }*/
+
+    int x = 0;
+    int y = 0;
+
+    for (int i = 0; i < 7; i++)
+    {
+        bool numberRemoved = false;
+        randomNumber = Sudokugenerator::numberGenerator.getNumber();
+
+        while (!numberRemoved)
+        {
+            x = Sudokugenerator::numberGenerator.getNumber();
+            y = Sudokugenerator::numberGenerator.getNumber();
+            if (Sudokugenerator::numberCanBePicked(x, y, randomNumber))
+            {
+                Sudokugenerator::removeNumberFromArray(x, y, randomNumber);
+                numberRemoved = true;
+            }
+
+        }
+
     }
 
-    Sudokugenerator::showArray(9);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray();
+
+
+    //Sudokugenerator::showArray(9);
     /*Sudokugenerator::fillBlockArray();
 
     printf("horizontal: %d\n", Sudokugenerator::horizontalBlocksOk());
@@ -174,22 +207,123 @@ void Sudokugenerator::showArray(int floor)
 
 bool Sudokugenerator::numberCanBePicked(int x, int y, int number)
 {
+    int x1 = 0;
+    int y1 = 0;
+
+    //Sudokugenerator::showArray(number);
+
     if (Sudokugenerator::sudokuArray[x][y][number] != number)
     {
         return false;
     }
+
+    // check if the block does not already contain this number
+    if ((x != 2 && y != 2) || (x != 5 && y != 5) || (x != 8 && y != 8))
+    {
+        if (x < 3)
+        {
+            x1 = 0;
+        }
+        else if (x < 6)
+        {
+            x1 = 3;
+        }
+        else
+        {
+            x1 = 6;
+        }
+
+        if (y < 3)
+        {
+            y1 = 0;
+        }
+        else if (y < 6)
+        {
+            y1 = 3;
+        }
+        else
+        {
+            y1 = 6;
+        }
+
+        // check blocks
+        bool secondNumberExists = false;
+
+        for (int i = 1; (i < 10 && !secondNumberExists); i++)
+        {
+            for (int y2 = 0; (y2 < 3 && !secondNumberExists); y2++)
+            {
+                for (int x2 = 0; (x2 < 3 && !secondNumberExists); x2++)
+                {
+                    //printf("_%d_", x2);
+                    //printf(".%d.", x2 < 3);
+                    if (Sudokugenerator::sudokuArray[x1 + x2][y1 + y2][i] == i )
+                    {
+                        secondNumberExists = true;
+                    }
+                }
+            }
+        }
+
+        if (!secondNumberExists)
+        {
+            return false;
+        }
+
+        // check line number next to this one In case we snatch the last free place for this one
+
+        for (int i = 1; i < 10; i++)
+        {
+            if ( i != number)
+            {
+                if (Sudokugenerator::sudokuArray[x+1][y][i] == i)
+                {
+                    secondNumberExists = true;
+                }
+            }
+        }
+
+        /*Sudokugenerator::showArray(1);
+        Sudokugenerator::showArray(2);
+        Sudokugenerator::showArray(3);
+        Sudokugenerator::showArray(4);
+        Sudokugenerator::showArray(5);
+        Sudokugenerator::showArray(6);
+        Sudokugenerator::showArray(7);
+        Sudokugenerator::showArray(8);
+        Sudokugenerator::showArray(9);*/
+
+        if (!secondNumberExists)
+        {
+            return false;
+        }
+
+    }
+
+    // add tests for empty blocks if the number gets removed. That would left me with a dead end
     // it's ok to take numbers out
     return true;
 }
 
 void Sudokugenerator::removeNumberFromArray(int x, int y, int number)
 {
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::sudokuArray[x][y][number] = (number * -1);
+    Sudokugenerator::sudokuArray[x][y][0] = number;
+
     for (int i = 0; i < 9; i++)
     {
         // remove horizontal
-        Sudokugenerator::sudokuArray[x][i][number] = 0;
+        if (Sudokugenerator::sudokuArray[x][i][number] == number)
+        {
+            Sudokugenerator::sudokuArray[x][i][number] = 0;
+        }
+
         // remove vertical
-        Sudokugenerator::sudokuArray[i][y][number] = 0;
+        if (Sudokugenerator::sudokuArray[i][y][number] == number)
+        {
+            Sudokugenerator::sudokuArray[i][y][number] = 0;
+        }
     }
 
     if (x < 3)
@@ -222,42 +356,10 @@ void Sudokugenerator::removeNumberFromArray(int x, int y, int number)
     {
         for (int j = 0; j < 3; j++)
         {
-            Sudokugenerator::sudokuArray[x + j][y + i][number] = 0;
-        }
-    }
-}
-
-void Sudokugenerator::generateBlock(int blockNr)
-{
-    int randomNumber = 0;
-    int addedNumbers = 0;
-    bool sequenceGenerated = false;
-    int numberSequence[9];
-    int counter = 0;
-    int* end = numberSequence + 9;
-
-    while (!sequenceGenerated)
-    {
-        randomNumber = Sudokugenerator::numberGenerator.getNumber();
-
-        int* result = std::find(numberSequence, end, randomNumber);
-        if (result == end)
-        {
-            numberSequence[addedNumbers] = randomNumber;
-            addedNumbers++;
-        }
-        if (addedNumbers == 9)
-        {
-            sequenceGenerated = true;
-        }
-    }
-
-    for (int i = 0; i < 3; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            Sudokugenerator::sudokuBlocks[j][i][blockNr] = numberSequence[counter];
-            counter ++;
+            if (Sudokugenerator::sudokuArray[x + j][y + i][number] == number)
+            {
+                Sudokugenerator::sudokuArray[x + j][y + i][number] = 0;
+            }
         }
     }
 }
@@ -283,119 +385,4 @@ void Sudokugenerator::initGenerator(int seed)
 {
     printf("\nSeed: %d\n\n", seed);
     Sudokugenerator::numberGenerator = Randomengine(seed);
-}
-
-void Sudokugenerator::showBlock(int blockNr)
-{
-    printf("3D Array, Floor number: %d\n", blockNr);
-
-    for (int i = 0; i < 3; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            printf("%d ", Sudokugenerator::sudokuBlocks[j][i][blockNr]);
-        }
-
-        printf("\n");
-    }
-}
-
-bool Sudokugenerator::sudokuGeneratedFromBlocks()
-{
-
-    return true;
-}
-
-bool Sudokugenerator::horizontalBlocksOk()
-{
-    // check the 9 rows
-    for (int i = 0; i < 9; i++)
-    {
-        // the cringe starts here, sorry too lazy at the moment
-        int zero = 0;
-        int one = 0;
-        int two = 0;
-        int three = 0;
-        int four = 0;
-        int five = 0;
-        int six = 0;
-        int seven = 0;
-        int eight = 0;
-        int nine = 0;
-
-        int k;
-        if (i < 3)
-        {
-            k = 0;
-        }
-        else if (i < 6)
-        {
-            k = 3;
-        }
-        else
-        {
-            k = 6;
-        }
-
-        // check 3 blocks at a time
-        //printf("\nZahlen:");
-        for (int counter = 0; counter < 3; counter++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                /*printf("%d", Sudokugenerator::sudokuBlocks[j][i % 3][k]);
-                Sudokugenerator::showBlock(k);*/
-                switch (Sudokugenerator::sudokuBlocks[j][i % 3][k])
-                {
-                    case 0:
-                        zero++;
-                    break;
-                    case 1:
-                        one++;
-                    break;
-                    case 2:
-                        two++;
-                    break;
-                    case 3:
-                        three++;
-                    break;
-                    case 4:
-                        four++;
-                    break;
-                    case 5:
-                        five++;
-                    break;
-                    case 6:
-                        six++;
-                    break;
-                    case 7:
-                        seven++;
-                    break;
-                    case 8:
-                        eight++;
-                    break;
-                    case 9:
-                        nine++;
-                    break;
-                    default:
-                        zero++;
-                    break;
-                }
-            }
-            k++;
-        }
-        //printf("\n");
-
-        //printf("zahlenreihe: %d%d%d%d%d%d%d%d%d%d", zero, one,two,three,four,five,six,seven,eight,nine);
-        if (zero > 1 || one > 1 || two > 1 || three > 1 || four > 1 || five > 1 || six > 1 || seven > 1 || eight > 1 || nine > 1)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool Sudokugenerator::verticalBlocksOk()
-{
-    return true;
 }
