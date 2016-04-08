@@ -14,6 +14,7 @@ public:
     void showBlock(int blockNr = 0);
     void init(int seed = 0);
     bool loadFromFile(std::string sudokuString);
+    void solveSudoku();
 
 protected:
     int sudokuArray[9][9][10];
@@ -32,6 +33,8 @@ private:
     void removeNumberFromArray(int x, int y, int number);
     int cellHasOnlyOneValue(int x, int y);
     std::tuple<int, int, int> blockHasOnlyOneValue(int x, int y);
+    bool fillSingleCells();
+    int blockWithMinimumRemainingValues();
 };
 
 #endif // __Sudokugenerator__

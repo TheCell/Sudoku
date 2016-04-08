@@ -13,7 +13,8 @@ void Sudokugenerator::init(int seed)
 {
     //Sudokugenerator::generateSudoku(seed);
     Sudokugenerator::prepareArray();
-    std::string sudokuString = "003020600900305001001806400008102900700000008006708200002609500800203009005010300";
+    //std::string sudokuString = "003020600900305001001806400008102900700000008006708200002609500800203009005010300";
+    std::string sudokuString = "000000600000305001001806400008102900700000008006708200002609500800203009005010300";
     if (Sudokugenerator::loadFromFile(sudokuString))
     {
         std::cout << "loading success!";
@@ -528,4 +529,467 @@ bool Sudokugenerator::loadFromFile(std::string sudokuString)
         }
     }
     return true;
+}
+
+bool Sudokugenerator::fillSingleCells()
+{
+    bool arrayModified = false;
+
+    for (int y = 0; y < 9; y++)
+    {
+        for (int x = 0; x < 9; x++)
+        {
+            int number = Sudokugenerator::cellHasOnlyOneValue(x, y);
+            if (number > 0)
+            {
+                Sudokugenerator::removeNumberFromArray(x, y, number);
+                arrayModified = true;
+                Sudokugenerator::arrayChanged = true;
+            }
+        }
+    }
+
+    if (arrayModified)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void Sudokugenerator::solveSudoku()
+{
+    bool cellRemoved = true;
+    while (cellRemoved)
+    {
+        cellRemoved = false;
+        Sudokugenerator::arrayChanged = true;
+        Sudokugenerator::showArray();
+        cellRemoved = Sudokugenerator::fillSingleCells();
+    }
+
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(9);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(8);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(7);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(6);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(5);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(4);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(3);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(2);
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(1);
+
+    int nextBlockCheck = Sudokugenerator::blockWithMinimumRemainingValues();
+
+    printf("Block Number %d has the lowest possibilitys\n", nextBlockCheck);
+
+    printf("SOLVED!\n");
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray();
+}
+
+int Sudokugenerator::blockWithMinimumRemainingValues()
+{
+    // the 9 blocks of a Sudoku
+    int blocks[9];
+    // temporary array for holding the numbers
+    int tempValues[9];
+    int blockWithMinimum = -1;
+
+    for (int y = 0; y < 9; y++)
+    {
+        for (int x = 0; x < 9; x++)
+        {
+            int x2 = 0;
+            int y2 = 0;
+
+            if (x < 3)
+            {
+                x2 = 0;
+            }
+            else if (x < 6)
+            {
+                x2 = 3;
+            }
+            else
+            {
+                x2 = 6;
+            }
+
+            if (y < 3)
+            {
+                y2 = 0;
+            }
+            else if (y < 6)
+            {
+                y2 = 3;
+            }
+            else
+            {
+                y2 = 6;
+            }
+
+            // THIS IS A MESS, DON'T KILL ME, I'm sorry for copy pasta this, struct with inner method was a struggle
+            if (x2 == 0 && y2 == 0)
+            {
+                int blockNumber = 0;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                int numberInArr = Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i];
+                                //printf("%d and i = %d | x%d y%d\n", numberInArr, i, x3 + x2, y3 + y2);
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (x2 == 3 && y2 == 0)
+            {
+                int blockNumber = 1;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                int numberInArr = Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i];
+                                //printf("%d and i = %d | x%d y%d\n", numberInArr, i, x3 + x2, y3 + y2);
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (x2 == 6 && y2 == 0)
+            {
+                int blockNumber = 2;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (x2 == 0 && y2 == 3)
+            {
+                int blockNumber = 3;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (x2 == 3 && y2 == 3)
+            {
+                int blockNumber = 4;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (x2 == 6 && y2 == 3)
+            {
+                int blockNumber = 5;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (x2 == 0 && y2 == 6)
+            {
+                int blockNumber = 6;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (x2 == 3 && y2 == 6)
+            {
+                int blockNumber = 7;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (x2 == 6 && y2 == 6)
+            {
+                int blockNumber = 8;
+                blocks[blockNumber] = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    tempValues[i] = 0;
+                }
+
+                // loop through the block and check every cell
+                for (int y3 = 0; y3 < 3; y3++)
+                {
+                    for (int x3 = 0; x3 < 3; x3++)
+                    {
+                        // check if there is not already a number assigned to this cell
+                        if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][0] == 0)
+                        {
+                            // iterate all numbers to check which number is possible
+                            for (int i = 9; i > 0; i--)
+                            {
+                                // check if the cell is still untouched
+                                if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
+                                {
+                                    //printf("number %d is possible in block %d at Pos x%d, y%d\n", i, blockNumber, x3 + x2, y3 + y2);
+
+                                    // check if number is already found at another cell of this block;
+                                    if (tempValues[i] != i)
+                                    {
+                                        tempValues[i] = i;
+                                        blocks[blockNumber] ++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    int tempAmount = 10;
+    for (int i = 0; i < 9; i++)
+    {
+        if (blocks[i] < tempAmount)
+        {
+            tempAmount = blocks[i];
+            blockWithMinimum = i;
+        }
+    }
+
+    return blockWithMinimum;
+
 }

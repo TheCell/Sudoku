@@ -5,6 +5,7 @@ void Gamemgr::init()
 {
     Gamemgr::sudokugenerator.init(123);
     Gamemgr::m_isRunning = true;
+    Gamemgr::sudokugenerator.solveSudoku();
 }
 
 void Gamemgr::handleEvents()
