@@ -209,11 +209,31 @@ void Sudokugenerator::showArray(int floor)
     {
         printf("3D Array, Floor number: %d\n", floor);
 
+        printf(" |----------+-----------+----------| \n");
         for (int y = 0; y < 9; y++)
         {
             for (int x = 0; x < 9; x++)
             {
-                printf("%d ", Sudokugenerator::sudokuArray[x][y][floor]);
+                if (x == 0)
+                {
+                    printf(" | %d ", Sudokugenerator::sudokuArray[x][y][floor]);
+                }
+                else if (x == 8)
+                {
+                    printf(" %d | ", Sudokugenerator::sudokuArray[x][y][floor]);
+                }
+                else if (x % 3 == 0)
+                {
+                    printf(" |  %d ", Sudokugenerator::sudokuArray[x][y][floor]);
+                }
+                else
+                {
+                    printf(" %d ", Sudokugenerator::sudokuArray[x][y][floor]);
+                }
+                if ((y + 1) % 3 == 0 && x == 8)
+                {
+                    printf("\n |----------+-----------+----------|");
+                }
             }
 
             printf("\n");
@@ -344,9 +364,9 @@ void Sudokugenerator::removeNumberFromArray(int x, int y, int number)
         }
 
         // remove on all other floors.
-        if (Sudokugenerator::sudokuArray[x][y][i] == i)
+        if (Sudokugenerator::sudokuArray[x][y][i + 1] == i + 1)
         {
-            Sudokugenerator::sudokuArray[x][y][i] = 0;
+            Sudokugenerator::sudokuArray[x][y][i + 1] = 0;
         }
     }
 
@@ -519,18 +539,33 @@ bool Sudokugenerator::loadFromFile(std::string sudokuString)
         {
             printf("x:%d y:%d\n", x, y);
         }*/
-        if (Sudokugenerator::numberCanBePicked(x, y, (sudokuString[i] - '0')))
+        if (sudokuString[i] - '0' > 0)
         {
-            Sudokugenerator::removeNumberFromArray(x, y, (sudokuString[i] - '0'));
-        }
-        else
-        {
-            return false;
+
+            if (Sudokugenerator::numberCanBePicked(x, y, (sudokuString[i] - '0')))
+            {
+                Sudokugenerator::removeNumberFromArray(x, y, (sudokuString[i] - '0'));
+                /*if (x == 0 && y == 4)
+                {
+                    printf("number xy 7 oder 9 _%d_", sudokuString[i] - '0');
+                    Sudokugenerator::arrayChanged = true;
+                    Sudokugenerator::showArray(7);
+                }*/
+            }
+            else
+            {
+                return false;
+            }
         }
     }
+
     return true;
 }
 
+/**
+ * @brief Sudokugenerator::fillSingleCells checks the Sudoku for Cells with a single applicable Number
+ * @return true if a cell has been filled, false if no cell has a single value left
+ */
 bool Sudokugenerator::fillSingleCells()
 {
     bool arrayModified = false;
@@ -540,6 +575,8 @@ bool Sudokugenerator::fillSingleCells()
         for (int x = 0; x < 9; x++)
         {
             int number = Sudokugenerator::cellHasOnlyOneValue(x, y);
+
+            //printf("_%d/x%d/y%d_", number,x,y);
             if (number > 0)
             {
                 Sudokugenerator::removeNumberFromArray(x, y, number);
@@ -570,6 +607,11 @@ void Sudokugenerator::solveSudoku()
         cellRemoved = Sudokugenerator::fillSingleCells();
     }
 
+    // no cell can be easily filled in now but there can be free cells.
+    std::string placeholder = Sudokugenerator::sudokuToString();
+
+    //std::cout << "tempSudoku: " << placeholder << std::endl;
+
     Sudokugenerator::arrayChanged = true;
     Sudokugenerator::showArray(9);
     Sudokugenerator::arrayChanged = true;
@@ -589,13 +631,32 @@ void Sudokugenerator::solveSudoku()
     Sudokugenerator::arrayChanged = true;
     Sudokugenerator::showArray(1);
 
-    int nextBlockCheck = Sudokugenerator::blockWithMinimumRemainingValues();
 
-    printf("Block Number %d has the lowest possibilitys\n", nextBlockCheck);
+    bool valueGuessed = Sudokugenerator::guessNextValue();
+    Sudokugenerator::arrayChanged = true;
+    Sudokugenerator::showArray(0);
+    if (valueGuessed)
+    {
+        std::cout << "value guessed";
+        bool cellRemoved = true;
+        while (cellRemoved)
+        {
+            cellRemoved = false;
+            Sudokugenerator::arrayChanged = true;
+            Sudokugenerator::showArray();
+            cellRemoved = Sudokugenerator::fillSingleCells();
+        }
+    }
+    else
+    {
+        std::cout << "value NOT guessed";
+    }
 
-    printf("SOLVED!\n");
     Sudokugenerator::arrayChanged = true;
     Sudokugenerator::showArray();
+
+    // TODO check dead ends and load other branches in
+    printf("SOLVED!\n");
 }
 
 int Sudokugenerator::blockWithMinimumRemainingValues()
@@ -660,7 +721,7 @@ int Sudokugenerator::blockWithMinimumRemainingValues()
                             // iterate all numbers to check which number is possible
                             for (int i = 9; i > 0; i--)
                             {
-                                int numberInArr = Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i];
+                                //int numberInArr = Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i];
                                 //printf("%d and i = %d | x%d y%d\n", numberInArr, i, x3 + x2, y3 + y2);
                                 // check if the cell is still untouched
                                 if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
@@ -698,7 +759,7 @@ int Sudokugenerator::blockWithMinimumRemainingValues()
                             // iterate all numbers to check which number is possible
                             for (int i = 9; i > 0; i--)
                             {
-                                int numberInArr = Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i];
+                                //int numberInArr = Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i];
                                 //printf("%d and i = %d | x%d y%d\n", numberInArr, i, x3 + x2, y3 + y2);
                                 // check if the cell is still untouched
                                 if (Sudokugenerator::sudokuArray[x3 + x2][y3 + y2][i] == i)
@@ -992,4 +1053,152 @@ int Sudokugenerator::blockWithMinimumRemainingValues()
 
     return blockWithMinimum;
 
+}
+
+std::tuple<int, int, int> Sudokugenerator::cellInBlockWithLowestPossibilities(int blockNumber)
+{
+    int x = 0;
+    int y = 0;
+    int tempLowest = -1;
+    auto coordinates = std::make_tuple (-1, -1, -1);
+
+    if (blockNumber == 2 || blockNumber == 5 || blockNumber == 8)
+    {
+        x = 3;
+    }
+    else if (blockNumber == 3 || blockNumber == 6 || blockNumber == 9)
+    {
+        x = 6;
+    }
+
+    if (blockNumber > 3 && blockNumber < 7)
+    {
+        y = 3;
+    }
+    else if (blockNumber > 6)
+    {
+        y = 6;
+    }
+
+    for (int y2 = 0; y2 < 3; y2++)
+    {
+        for (int x2 = 0; x2 < 3; x2++)
+        {
+            if (Sudokugenerator::sudokuArray[x + x2][y + y2][0] == 0)
+            {
+                int numbers = Sudokugenerator::amountOfPossibleValuesForCell(x + x2, y + y2);
+
+                if (tempLowest < numbers)
+                {
+                    tempLowest = numbers;
+                    std::get<0>(coordinates) = x + x2;
+                    std::get<1>(coordinates) = y + y2;
+                    std::get<2>(coordinates) = Sudokugenerator::getFirstFreeNumber(x + x2, y + y2);
+                }
+            }
+        }
+    }
+
+    return coordinates;
+}
+
+std::string Sudokugenerator::sudokuToString()
+{
+    std::string sudokuAsString = "";
+
+    for (int y = 0; y < 9; y++)
+    {
+        for (int x = 0; x < 9; x++)
+        {
+            sudokuAsString += std::to_string(Sudokugenerator::sudokuArray[x][y][0]);
+        }
+    }
+
+    return sudokuAsString;
+}
+
+bool Sudokugenerator::guessNextValue()
+{
+    int nextBlockCheck = Sudokugenerator::blockWithMinimumRemainingValues();
+    printf("Block Number %d has the lowest possibilities\n", nextBlockCheck);
+
+    auto nextCell = Sudokugenerator::cellInBlockWithLowestPossibilities(nextBlockCheck);
+    printf("Cell x%d y%d has the lowest possibilities\n", std::get<0>(nextCell), std::get<1>(nextCell));
+
+    if (std::get<0>(nextCell) > -1 && std::get<1>(nextCell) > -1)
+    {
+        if (Sudokugenerator::numberCanBePicked(std::get<0>(nextCell), std::get<1>(nextCell), std::get<2>(nextCell)))
+        {
+            std::cout << "Number " << std::get<2>(nextCell) << " at Pos x" << std::get<0>(nextCell) << ", y" << std::get<1>(nextCell) << " guessed" << std::endl;
+            Sudokugenerator::removeNumberFromArray(std::get<0>(nextCell), std::get<1>(nextCell), std::get<2>(nextCell));
+            return true;
+        }
+        else
+        {
+            std::cout << "Number can not be picked" << std::endl;
+            return false;
+        }
+    }
+    else
+    {
+        std::cout << "woops" << std::endl;
+        return false;
+    }
+}
+
+int Sudokugenerator::amountOfPossibleValuesForCell(int x, int y)
+{
+    int possibilities = 0;
+
+    for (int i = 10; i > 0; i--)
+    {
+        if (Sudokugenerator::sudokuArray[x][y][i] == i)
+        {
+            possibilities++;
+        }
+    }
+
+    return possibilities;
+}
+
+int Sudokugenerator::getFirstFreeNumber(int x, int y)
+{
+    for (int i = 10; i > 0; i--)
+    {
+        if (Sudokugenerator::sudokuArray[x][y][i] == i)
+        {
+            return i;
+        }
+    }
+
+    std::cout << "Cell has no free Numbers";
+    return -1;
+}
+
+//todo
+bool Sudokugenerator::pathIsDeadEnd()
+{
+    bool isDeadEnd = true;
+
+    if (!Sudokugenerator::sudokuHasEmptySpots())
+    {
+
+    }
+    return isDeadEnd;
+}
+
+//todo
+bool Sudokugenerator::sudokuHasEmptySpots()
+{
+    for (int y = 0; y < 9; y++)
+    {
+        for (int x = 0; x < 9; x++)
+        {
+            if (Sudokugenerator::sudokuArray[x][y][0] == 0)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }

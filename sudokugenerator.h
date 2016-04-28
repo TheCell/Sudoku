@@ -35,6 +35,13 @@ private:
     std::tuple<int, int, int> blockHasOnlyOneValue(int x, int y);
     bool fillSingleCells();
     int blockWithMinimumRemainingValues();
+    std::string Sudokugenerator::sudokuToString();
+    bool Sudokugenerator::guessNextValue();
+    std::tuple<int, int, int> Sudokugenerator::cellInBlockWithLowestPossibilities(int blockNumber);
+    int Sudokugenerator::amountOfPossibleValuesForCell(int x, int y);
+    int Sudokugenerator::getFirstFreeNumber(int x, int y);
+    bool Sudokugenerator::sudokuHasEmptySpots();
+    bool Sudokugenerator::pathIsDeadEnd();
 };
 
 #endif // __Sudokugenerator__
